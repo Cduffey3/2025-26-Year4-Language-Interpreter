@@ -1,0 +1,34 @@
+package projectFiles;
+
+/*
+ * This class is responsible for paring Jott Tokens
+ * into a Jott parse tree.
+ *
+ * @author
+ */
+
+import provided.JottTree;
+import provided.Token;
+import java.util.ArrayList;
+
+
+public class JottParser {
+
+    /**
+     * Parses an ArrayList of Jotton tokens into a Jott Parse Tree.
+     *
+     * @param tokens the ArrayList of Jott tokens to parse
+     * @return the root of the Jott Parse Tree represented by the tokens.
+     * or null upon an error in parsing.
+     */
+    public static JottTree parse(ArrayList<Token> tokens) {
+        JottTree tree;
+        try {
+            tree = ProgramNode.parseProgram(tokens);
+        } catch (ParserSyntaxError syntaxError) {
+            System.err.println(syntaxError.getMessage());
+            return null;
+        }
+        return tree;
+    }
+}

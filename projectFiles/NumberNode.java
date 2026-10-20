@@ -1,0 +1,113 @@
+package projectFiles;
+
+import provided.Token;
+import provided.TokenType;
+
+import java.util.ArrayList;
+
+public class NumberNode extends ExpressionNode {
+    Token number;
+    String type;
+
+    public NumberNode(Token number, String type) {
+        this.number = number;
+        this.type = type;
+    }
+
+    @Override
+    public Token getToken() {
+        return number;
+    }
+
+    public static NumberNode parseNumberNode(ArrayList<Token> tokens) throws ParserSyntaxError{
+        Token currentToken = tokens.get(0);
+        String type = null;
+        if(currentToken.getTokenType() != TokenType.NUMBER){
+            throw new ParserSyntaxError("Expected a Number, got: ", tokens.get(0));
+        }
+        else{
+            if(currentToken.getToken().contains(".")){
+                type = "Double";
+                tokens.remove(0);
+                return new NumberNode(currentToken, type);
+            }
+            else{
+                type = "Integer";
+                tokens.remove(0);
+                return new NumberNode(currentToken, type);
+            }
+        }
+    }
+
+    @Override
+    public String convertToJott() {
+        return number.getToken();
+    }
+
+    @Override
+    public String convertToJava(String className) {
+        return number.getToken();
+    }
+
+    @Override
+    public String convertToC() {
+        return number.getToken();
+    }
+
+    @Override
+    public String convertToPython() {
+        return number.getToken();
+    }
+
+    @Override
+    public boolean validateTree() {
+        //if (number == null) return false;     //NOTE: Redundant, Token 'number' must always have value
+        //if (number.getTokenType() != TokenType.NUMBER) return false;  //NOTE: Redundant, check parseNumberNode
+
+        String token = number.getToken();
+        if (token == null || token.isEmpty()){
+            throw new SemanticSyntaxError("Undeclared number", number);
+        }
+
+        // Valid Tokens:
+        //  - digits (e.g. 123)
+        //  - digits.decimal (e.g. 12.34)
+        //  - .digits (e.g. .5)
+        // Disallow multiple decimals or standalone "." 
+        boolean result = token.matches("(\\d+(\\.\\d+)?|\\.\\d+)");
+        if (result) {
+            return true;
+        } else {
+            throw new SemanticSyntaxError("Invalid decimal", number);
+        }
+    }
+
+    public String getType() {
+        if (type == null || type.isEmpty()) {
+            String val = number.getToken();
+            if (val != null && val.contains(".")) {
+                return "Double";
+            }
+            return "Integer";
+        }
+        return type;
+    }
+
+    public boolean isNegative(){
+        String t = number.getToken();
+        if (t == null || t.isEmpty()) return false;
+        return t.charAt(0) == '-';
+    }
+
+    public Object getValue() {
+        String val = number.getToken();
+
+        if (getType().equals("Integer")) {
+            return Integer.parseInt(val);
+        } else {
+            return Double.parseDouble(val);
+        }
+    }
+
+
+}
